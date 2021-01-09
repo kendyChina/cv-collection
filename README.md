@@ -1,3 +1,5 @@
+[TOC]
+
 # CNN之思考  
 ## 频域之于CNN泛化性的解释 2020  
 **论文：** [https://arxiv.org/abs/1905.13545](https://arxiv.org/abs/1905.13545)  
