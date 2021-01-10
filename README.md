@@ -40,6 +40,7 @@ Carnegie Mellon University
 ## R-CNN  
 ## Fast R-CNN  
 ## Faster R-CNN  
+## SSD  
 ## YOLO  
 ## YOLOv2  
 ## YOLOv3  
@@ -107,6 +108,7 @@ Academia Sinica, Taiwan
   
   
 # 小目标检测  
+  
 ## COCO小目标检测的数据增强 2019  
 **论文：** [https://arxiv.org/abs/1902.07296](https://arxiv.org/abs/1902.07296)  
 **标题：** Augmentation for small object detection  
@@ -127,11 +129,6 @@ Academia Sinica, Taiwan
   
   
   
-# 图像分割  
-## FCN  
-## U-Net  
-## DeepLab  
-  
   
 # 轻量型算法  
   
@@ -143,8 +140,63 @@ Academia Sinica, Taiwan
   
   
   
+# 剪枝  
+## 卷积核剪枝 2017  
+**论文：** [https://arxiv.org/abs/1608.08710](https://arxiv.org/abs/1608.08710)  
+**标题：** Pruning Filters for Efficient ConvNets  
+**作者：** Hao Li∗  
+University of Maryland  
+  
+Asim Kadav  
+NEC Labs America  
+  
+Igor Durdanovic  
+NEC Labs America  
+  
+Hanan Samet†  
+University of Maryland  
+  
+Hans Peter Graf  
+NEC Labs America  
+**收录：** ICLR 2017  
+**无官方代码**  
+  
+**关键词：**  
+  
+ - 假设$F_{i, j}$是基于第$n$层特征图生成第$n+1$层特征图的第$j$个通道的卷积核，裁剪该卷积核会另第$n+1$层特征图的通道数减1。会减少$i$到$i+1$一个卷积核的计算量，以及$i+1$到$i+2$所有卷积核这个通道的计算量；  
+ - 与其他范数相比，L1范数对激活函数过后的特征图的裁剪效果更好；  
+ - 裁剪第$i$层特征图的m个卷积核的流程：  
+	1. 计算每个卷积核所有权重绝对值的和$s_j$；  
+	2. 对该层所有$s_j$排序；  
+	3. 删除$s_j$最小的m个卷积核，及其对应生成的第$i+1$层的特征图，还有第$i+1$层的所有卷积核对应这m个通道的通道；  
+	4. 创建新的第$i$和$i+1$层的kernel matrix，并把剩余权重赋值。  
+ - 这比基于threshold再一刀切的效果要好，因为后者很难把握threshold大小，且容易生成稀疏卷积核，难以进行加速；  
+ - figure 2很重要。(b)里随着剪枝百分比增加，依旧平滑的卷积层，对应(a)里斜率最平滑的层，这些是对剪枝敏感度最低的层。  
+ - 在(a)里，对于一条曲线，是对同一层所有核L1-sum并排序后，随着横坐标往右，从大到小遍历所有核的L1-sum值。纵坐标是除以最大值后归一化的值。  
+ - 综上，**个人理解是**如果这一层所有卷积核的L1-sum值的变化比较平缓，慢慢从1~0，曲线比较平滑，则该层对剪枝的敏感度更低。反之亦然；  
+ - 且相邻相同feature map大小的层对剪枝的敏感度相似，故给予相同的剪枝率；  
+ - 整体裁剪是比逐层裁剪更实际的，除了在时间损耗低外，还能给模型一个全局的视野，或许能提高鲁棒性；而且对于复杂网络也是必要的，如ResNet的残差模块如果剪了第二层，会导致额外的剪枝；  
+ - 整体剪枝时有两种策略，实验证明后者更优（见下图figure 3）：  
+	1. 虽然第$i$层会受到上一层$i-1$的影响，但我们忽略其影响，即每一层都独立计算；  
+	2. **贪心策略：** 考虑上一层的影响，即$i-1$已剪枝的通道，$i$层对其忽略。  
+ - 对于残差结构，要考虑到模块结尾相加时尺寸的一致性。因shortcut比残差卷积更重要，故残差的第二层卷积的裁剪取决于shortcut的通道重要性。shortcut的通道重要性则通过增加 1 x 1卷积核来体现（见下图figure 4）；  
+ - 不太敏感的层可以一次性裁剪后retrain，敏感层或大面积裁剪层可能迭代裁剪retrain会更好，但更耗时；  
+ - 重新训练剪枝网络比retrain效果差，说明小容量网络训练更难；  
+ - 实验表明，裁剪每个block（相同feature size）第一层的影响最大；  
+ - 作者对相同block不同layer、不同裁剪策略（随机、裁剪最大）、不同比对指标（L1等）做了比较，后面有实际需要可详细参照。  
+  
+![裁剪卷积核F_{i, j}对临近特征图的影响](https://img-blog.csdnimg.cn/20210110204328629.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210110205802518.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![整体裁剪的两种策略图](https://img-blog.csdnimg.cn/20210110214727671.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![残差模块的裁剪图例](https://img-blog.csdnimg.cn/20210110214818235.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+  
+  
+  
+  
+  
   
 # 目标跟踪  
+  
   
 ## 数据集  
   
@@ -284,3 +336,10 @@ Queensland University of Technology†, University of Sydney⋄
 **作者：**  
 **代码：** [https://github.com/nwojke/deep_sort](https://github.com/nwojke/deep_sort)  
 **翻译：**  
+  
+  
+  
+# 图像分割  
+## FCN  
+## U-Net  
+## DeepLab  
