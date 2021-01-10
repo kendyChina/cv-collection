@@ -35,9 +35,6 @@ Carnegie Mellon University
   
 参考文档：[https://mp.weixin.qq.com/s/jdy07LGbChMuSuGjX5qOJg](https://mp.weixin.qq.com/s/jdy07LGbChMuSuGjX5qOJg)  
   
-
----
-
   
 # 目标检测  
 ## R-CNN  
@@ -108,14 +105,8 @@ Academia Sinica, Taiwan
   
   
   
-
----
-
   
 # 小目标检测  
-
----
-
 ## COCO小目标检测的数据增强 2019  
 **论文：** [https://arxiv.org/abs/1902.07296](https://arxiv.org/abs/1902.07296)  
 **标题：** Augmentation for small object detection  
@@ -134,25 +125,13 @@ Academia Sinica, Taiwan
   
   
   
-
----
-
   
   
 # 图像分割  
 ## FCN  
-
----
-
 ## U-Net  
-
----
-
 ## DeepLab  
   
-
----
-
   
 # 轻量型算法  
   
@@ -163,20 +142,11 @@ Academia Sinica, Taiwan
 ## GhostNet  
   
   
-
----
-
   
   
 # 目标跟踪  
-
----
-
   
 ## 数据集  
-
----
-
   
 ### VOT  
 **VOT：** **V**isual **O**bject **T**racking  
@@ -192,9 +162,6 @@ Academia Sinica, Taiwan
   
 评价指标每年都不太一样，可参考官方对当年Challenge的公告。  
   
-
----
-
   
 ### OTB  
   
@@ -203,9 +170,6 @@ Academia Sinica, Taiwan
   
   
   
-
----
-
   
   
 ## GOTURN 2016  
@@ -235,9 +199,6 @@ Stanford University
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201118114007825.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70#pic_center)  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201118114019526.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70#pic_center)  
   
-
----
-
   
 ## MDNet 2015  
 **MDNet：** **M**ulti-**D**omain Convolutional Neural **Net**work Tracker  
@@ -265,9 +226,6 @@ Dept. of Computer Science and Engineering, POSTECH, Korea
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201118183613807.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70#pic_center)  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201118183645320.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70#pic_center)  
   
-
----
-
   
 ## ROLO 2016  
 **ROLO：** **R**ecurrent Y**OLO** for object tracking  
@@ -296,9 +254,6 @@ TCL Research America
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124170048828.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70#pic_center)  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20201124170057196.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70#pic_center)  
   
-
----
-
   
 ## SORT 2016  
 **SORT：** **S**imple **O**nline and **R**ealtime **T**racking  
@@ -319,9 +274,6 @@ Queensland University of Technology†, University of Sydney⋄
  - Kalman Filter跟踪目标Bounding Box的[u, v, s, r]，并更新[u, v, s]，分别是目标中心的坐标、尺寸、纵横比  
  - 基于IoU距离计算cost矩阵，通过Hungarian算法assign目标  
   
-
----
-
   
 ## DeepSORT 2017  
   
