@@ -338,6 +338,40 @@ Queensland University of Technology†, University of Sydney⋄
 **翻译：**  
   
   
+# 动作识别  
+## Two-Stream Conv 2014  
+**论文：** [https://arxiv.org/abs/1406.2199](https://arxiv.org/abs/1406.2199)  
+**标题：** Two-Stream Convolutional Networks for Action Recognition in Videos  
+**作者：** Karen Simonyan  
+Andrew Zisserman  
+Visual Geometry Group, University of Oxford  
+**收录：** NIPS 2014  
+  
+**关键词：**  
+  
+ - 针对视频信息，划分为**空间**(Spatial)域和**时间**(Temporal)域。前者可直观通过单帧判断目标的动作信息，后者则在时序上弥补单帧所无法分别的信息（如开门和关门）；  
+ - 基于上述直觉，使用了两个卷积网络，分别为Spatial stream ConvNet、Temporal stream ConvNet（见后图Figure 1）；  
+ - 两个网络的fusion方式有二：两者取平均、训练分类器进行权重划分；  
+ - Spatial stream基于ImageNet预训练；  
+ - Temporal stream把**Optical flow**（光流）作为输入，如后图Figure 2对光流的可视化，a、b为相邻两帧，c为蓝色框的光流可视化，d、e分别为x、y方向的displacement vector可视化（即Temporal的输入）；  
+ - 对于L帧视频，每帧间有$d_x$、$d_y$即2L个通道，作者提出多种计算方式：  
+	 1. Optical flow stacking。每个点表示帧 t 移动到帧 t+1 的对应点。如下图Figure 3左，多个帧每次都在相同位置采样，不跨帧进行考虑（公式见下式1）；  
+	 2. Trajectory stacking。每个点表示沿轨迹的位移，如下图Figure 3右；  
+	 3. Bi-directional optical flow。双向光流，即当前帧后L/2正向和帧前L/2反向堆叠，通道数为2L不变。且可与前两种方法共同使用；  
+	 4. Mean flow subtraction。光流对于正向和反向运动是有表示作用的，但摄像机的移动可能导致整体画面的方向偏移，故需要归一化来抵消整体移动。这里通过减每层均值来实现；  
+ - 基于多任务训练进行学习，针对不同训练集，模型后接对应的Softmax，一同对骨干网络进行训练，以弥补Temporal stream数据不足的情况（Spatial stream可ImageNet预训练）；  
+  
+![Two-stream architecture for video classification](https://img-blog.csdnimg.cn/20210116164511750.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![Optical flow](https://img-blog.csdnimg.cn/20210116164958669.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![ConvNet input derivation from the multi-frame optical flow](https://img-blog.csdnimg.cn/20210116171407986.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+Optical flow stacking：  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210116171640215.png)  
+Trajectory stacking：  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210116171738768.png)  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210116171747763.png)  
+  
+  
+  
   
 # 图像分割  
 ## FCN  
