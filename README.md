@@ -370,6 +370,43 @@ Trajectory stacking：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210116171738768.png)  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210116171747763.png)  
   
+## TSN 2016  
+**TSN：** **T**emporal **S**egment **N**etworks  
+**论文：** [https://arxiv.org/abs/1608.00859](https://arxiv.org/abs/1608.00859)  
+**标题：** Temporal Segment Networks: Towards Good Practices for Deep Action Recognition  
+**作者：** Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, Luc Van Gool  
+  
+Computer Vision Lab, ETH Zurich, Switzerland  
+Department of Information Engineering, The Chinese University of Hong Kong  
+Shenzhen Institutes of Advanced Technology, CAS, China  
+**收录：** ECCV 2016  
+**代码：** [https://github.com/yjxiong/temporal-segment-networks](https://github.com/yjxiong/temporal-segment-networks)  
+[https://github.com/yjxiong/caffe](https://github.com/yjxiong/caffe)  
+  
+**关键词：**  
+  
+ - Two-stream（双流）模型是对视频做密集采样，难以获取长跨度的视频信息，故在此基础上改用稀疏采样方式；  
+ - 对视频进行切片，如下图Fig 1切成K=3片，每片中随机选择snippet（小片段），再对每个snippet输入双流网络中，最后对K个snippet的结果进行融合。**可以理解为长视频中稀疏采样，每个稀疏片段中再密集采样**；  
+ - 【切片-双流-融合】的流程可表示为下公式1，$T_k$就是第k个片段里的snippet（实际上里面包含一个RGB图和两个光流特征图），$W$是网络参数，所以$F$就是指卷积网络计算，$g$是分别对Spatial和Temporal多个$F$进行融合，文中使用均值，得到两个Stream的多片段融合结果（Fig 1中的Segmental Consensus），最后用$H$结合两个Stream的结果，文中用Softmax（Fig 1中的Class Score Fusion）；  
+ - 对于最后的$H$使用交叉熵Loss，对于$g$则使用下图公式2，其中$C$是类别总数，$y_i$是第i类的label，$G_i$是Segmental Consensus对于第i类的预测；  
+ - 双流模型由原本的ClarifaiNet改用BN-Inception。且需注意，所有片段的Spatial ConvNet权重共享，Temporal ConvNet亦然；  
+ - 针对Spatial提出RGB difference，即前后两图的差值，加入了运动关联性（如下图2）；  
+ - 针对Temporal提出wraped optical flow，达到抑制背景运动的影响（如下图2）；  
+ - 将Spatial的预训练迁移到Temporal中；  
+ - 因数据量少可能导致过拟合，故使用**partial BN**，冻结第一层以外的BN层，仅通过第一层BN学习特征分布；  
+ - 并在global average pooling后接**dropout**，Spatial的dropout ratio是0.8而Temporal是0.7；  
+ - 实验证明Optical Flow + Warped Flow + RGB效果最好，RGB difference的负面影响可能来自于其不稳定性。  
+  
+  
+![Fig 1](https://img-blog.csdnimg.cn/20210117105245467.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+  
+![Fig 2](https://img-blog.csdnimg.cn/20210117112621346.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+  
+公式1：  
+![Formula 1](https://img-blog.csdnimg.cn/20210117105843417.png)  
+公式2：  
+![Formula 2](https://img-blog.csdnimg.cn/20210117111307841.png)  
+参考链接：[https://blog.csdn.net/u014380165/article/details/79029309](https://blog.csdn.net/u014380165/article/details/79029309)  
   
   
   
