@@ -409,6 +409,38 @@ Shenzhen Institutes of Advanced Technology, CAS, China
 参考链接：[https://blog.csdn.net/u014380165/article/details/79029309](https://blog.csdn.net/u014380165/article/details/79029309)  
   
   
+## TRN 2017  
+**TRN：** **T**emporal **R**elation **N**etwork  
+**官网：** [http://relation.csail.mit.edu/](http://relation.csail.mit.edu/)  
+**论文：** [https://arxiv.org/abs/1711.08496v2](https://arxiv.org/abs/1711.08496v2)  
+**标题：** Temporal Relational Reasoning in Videos  
+**作者：** Bolei Zhou, Alex Andonian, Aude Oliva, Antonio Torralba  
+CSAIL, MIT  
+**代码：** [https://github.com/zhoubolei/TRN-pytorch](https://github.com/zhoubolei/TRN-pytorch)  
+**收录：** ECCV 2018  
+  
+**关键词：**  
+  
+ - 结合2帧、3帧、一直到n帧的结果，进行多时序尺度的融合（参考下图Fig 2）；  
+ - 如下公式1和公式2，是2帧推理过程和3帧推理过程的示例，其中$f_i$是第$i$帧经CNN的输出，$g$和$h$是MLP多层感知机；  
+ - 多时序尺度推理结果（2帧、3帧等）的融合如下公式3，$T_n$代表$n$帧的结果，需注意的是不同时序尺度中$g$和$h$使用各自独立的权重，而CNN权重统一；  
+ - 个人感觉和TSN的区别如下：  
+	 1. 舍弃了Temporal ConvNet；  
+	 2. 两者都对多帧进行了融合，TSN是在分别在Spatial和Temporal上取均值后，再Softmax得到结果，而TRN是多帧结果concat后，用多层感知机计算结果。感觉这种改动比前者的Average多了可学习时序的参数；  
+ - 因算力的限制，采每帧之间都会相隔数帧，那么采帧的频率越高，就越可能采到对预测起关键作用的帧；  
+ - 实验证明，TRN的优势在于有方向性的动作的识别性能上，对于无明显方向的动作，乱序和顺序数据的性能差异较小；  
+  
+  
+![Fig 2](https://img-blog.csdnimg.cn/20210124163714547.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+公式1：  
+![公式1](https://img-blog.csdnimg.cn/20210124163753334.png)  
+公式2：  
+![公式2](https://img-blog.csdnimg.cn/20210124163811185.png)  
+公式3：  
+![公式3](https://img-blog.csdnimg.cn/20210124164746193.png)  
+  
+  
+  
   
 # 图像分割  
 ## FCN  
