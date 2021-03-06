@@ -140,7 +140,7 @@ Academia Sinica, Taiwan
   
   
   
-# 剪枝  
+# 模型加速  
 ## 卷积核剪枝 2017  
 **论文：** [https://arxiv.org/abs/1608.08710](https://arxiv.org/abs/1608.08710)  
 **标题：** Pruning Filters for Efficient ConvNets  
@@ -163,27 +163,27 @@ NEC Labs America
   
 **关键词：**  
   
- - 假设$F_{i, j}$是基于第$n$层特征图生成第$n+1$层特征图的第$j$个通道的卷积核，裁剪该卷积核会另第$n+1$层特征图的通道数减1。会减少$i$到$i+1$一个卷积核的计算量，以及$i+1$到$i+2$所有卷积核这个通道的计算量；  
+ - 假设$F_{i, j}$是基于第$i$层特征图生成第$i+1$层特征图的第$j$个通道的卷积核，裁剪该卷积核会另第$i+1$层特征图的通道数减1。从而减少$i$到$i+1$一个卷积核的计算量，以及$i+1$到$i+2$所有卷积核对应这个被减通道的计算量；  
  - 与其他范数相比，L1范数对激活函数过后的特征图的裁剪效果更好；  
  - 裁剪第$i$层特征图的m个卷积核的流程：  
 	1. 计算每个卷积核所有权重绝对值的和$s_j$；  
 	2. 对该层所有$s_j$排序；  
 	3. 删除$s_j$最小的m个卷积核，及其对应生成的第$i+1$层的特征图，还有第$i+1$层的所有卷积核对应这m个通道的通道；  
 	4. 创建新的第$i$和$i+1$层的kernel matrix，并把剩余权重赋值。  
- - 这比基于threshold再一刀切的效果要好，因为后者很难把握threshold大小，且容易生成稀疏卷积核，难以进行加速；  
- - figure 2很重要。(b)里随着剪枝百分比增加，依旧平滑的卷积层，对应(a)里斜率最平滑的层，这些是对剪枝敏感度最低的层。  
- - 在(a)里，对于一条曲线，是对同一层所有核L1-sum并排序后，随着横坐标往右，从大到小遍历所有核的L1-sum值。纵坐标是除以最大值后归一化的值。  
+ - 这种按比例或按照排名的裁剪策略，比基于绝对值阈值来一刀切的效果要好，因为后者很难把握threshold的大小，且容易生成稀疏卷积核，难以进行加速；  
+ - figure 2很重要。(b)里随着剪枝百分比增加，曲线依旧平滑的卷积层，就对应(a)里斜率最平滑的层，这些兜是对剪枝敏感度较低的层。  
+ - 在(a)里，对于一条曲线，是对同一层所有核L1-sum并排序后，随着横坐标往右，从大到小遍历所有核的L1-sum值。纵坐标是除以最大值后归一化的值，可以对比出每一层的权值突变程度。  
  - 综上，**个人理解是**如果这一层所有卷积核的L1-sum值的变化比较平缓，慢慢从1~0，曲线比较平滑，则该层对剪枝的敏感度更低。反之亦然；  
  - 且相邻相同feature map大小的层对剪枝的敏感度相似，故给予相同的剪枝率；  
  - 整体裁剪是比逐层裁剪更实际的，除了在时间损耗低外，还能给模型一个全局的视野，或许能提高鲁棒性；而且对于复杂网络也是必要的，如ResNet的残差模块如果剪了第二层，会导致额外的剪枝；  
  - 整体剪枝时有两种策略，实验证明后者更优（见下图figure 3）：  
 	1. 虽然第$i$层会受到上一层$i-1$的影响，但我们忽略其影响，即每一层都独立计算；  
-	2. **贪心策略：** 考虑上一层的影响，即$i-1$已剪枝的通道，$i$层对其忽略。  
+	2. **贪心策略：** 考虑上一层的影响，即$i-1$层裁剪卷积核导致$i$层被剪枝的通道，在计算$i$层时对其忽略。  
  - 对于残差结构，要考虑到模块结尾相加时尺寸的一致性。因shortcut比残差卷积更重要，故残差的第二层卷积的裁剪取决于shortcut的通道重要性。shortcut的通道重要性则通过增加 1 x 1卷积核来体现（见下图figure 4）；  
  - 不太敏感的层可以一次性裁剪后retrain，敏感层或大面积裁剪层可能迭代裁剪retrain会更好，但更耗时；  
  - 重新训练剪枝网络比retrain效果差，说明小容量网络训练更难；  
- - 实验表明，裁剪每个block（相同feature size）第一层的影响最大；  
- - 作者对相同block不同layer、不同裁剪策略（随机、裁剪最大）、不同比对指标（L1等）做了比较，后面有实际需要可详细参照。  
+ - 实验表明，裁剪每个block（相同feature size内）的第一层的影响最大；  
+ - 作者对相同block不同layer、不同裁剪策略（随机、裁剪最大）、不同比对指标（L1等）做了比较，后面有实际需要可跳论文详细参照。  
   
 ![裁剪卷积核F_{i, j}对临近特征图的影响](https://img-blog.csdnimg.cn/20210110204328629.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210110205802518.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
@@ -191,7 +191,35 @@ NEC Labs America
 ![残差模块的裁剪图例](https://img-blog.csdnimg.cn/20210110214818235.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
   
   
+## INT8量化 2017  
+**材料：** [https://on-demand.gputechconf.com/gtc/2017/presentation/s7310-8-bit-inference-with-tensorrt.pdf](https://on-demand.gputechconf.com/gtc/2017/presentation/s7310-8-bit-inference-with-tensorrt.pdf)  
+**标题：** 8-bit Inference with TensorRT  
+**作者：** Szymon Migacz, NVIDIA  
   
+**关键词：**  
+  
+ - 这是一种训练后的量化方式，并非训练时量化方式；  
+ - 原本通过scale_factor和bias进行FP32和INT8之间的映射，但经过试验表明与性价比需求，bias可移除；  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210306163637569.png)  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210306163701317.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210306163755974.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210306163808671.png)  
+  
+ - 量化的方式，或者说从FP32映射至INT8的方式有两种：  
+	 1. 非饱和方式(No saturation)  
+	![在这里插入图片描述](https://img-blog.csdnimg.cn/20210306164031919.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+	 2. 饱和方式(saturation)  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/202103061640506.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+ - 非饱和方式是根据FP32的最大、小值对应127、-127映射到INT8的范围中；  
+ - 饱和方式是采用+-$|T|$作为阈值，超出阈值则映射至边界，阈值内则映射至范围内；  
+ - 量化操作其实要对数据（即本层的输入Tensor或上层的输出Tensor，即截图中所述的Activations）和权重进行，实验表明：对权重用非饱和、对数据进行饱和量化效果最佳；  
+ - 饱和量化的阈值选取很重要，也需要有指标显式地衡量阈值的优劣。这里用的是**KL散度**，来表明把FP32编码为INT8的损失；  
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210306165145686.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01hY0tlbmR5,size_16,color_FFFFFF,t_70)  
+ - 以FP32为基准，这是无损编码，称**信息熵**，编码至INT8后的编码长度为**交叉熵**，KL散度也即**相对熵**为两者的差值，故越小越好；  
+ - 具体做法是对训练后的FP32模型，提供一组校准数据集，数据**最好来自验证集且分布均匀**。遍历各种阈值下的激活值(Activations)分布，以KL散度选取最优的阈值。最终以这个阈值进行量化，记录对应的scale factor；  
+  
+参考文档：  
+[https://arleyzhang.github.io/articles/923e2c40/](https://arleyzhang.github.io/articles/923e2c40/)  
   
   
   
